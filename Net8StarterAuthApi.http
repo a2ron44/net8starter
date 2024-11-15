@@ -1,0 +1,6 @@
+@Net8StarterAuthApi_HostAddress = http://localhost:5034
+
+GET {{Net8StarterAuthApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

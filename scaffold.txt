@@ -1,0 +1,1 @@
+dotnet-aspnet-codegenerator --configuration "Debug" --no-build controller --controllerName AdminRole --relativeFolderPath "./Controllers" --restWithNoViews --model Net8StarterAuthApi.Models.AdminRole --dataContext Net8StarterAuthApi.Data.ApiDbContext --controllerNamespace Net8StarterAuthApi.Controllers 
