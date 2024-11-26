@@ -67,15 +67,17 @@ public class CognitoAuthService
         }
     }
 
-    public async Task<AuthTokenBundle> RefreshToken(string username, string refreshToken)
+    public async Task<AuthTokenBundle> RefreshToken(string userSubId, string refreshToken)
     {
-        var secretHash = CognitoHelper.GenerateSecretHash(username, _clientId, _clientSecret);
+        //need to use user sub for the refresh - dumb. 
+        var secretHash = CognitoHelper.GenerateSecretHash(userSubId, _clientId, _clientSecret);
 
         try
         {
             // Create the request for initiating authentication using the refresh token
-            var initiateAuthRequest = new InitiateAuthRequest
+            var initiateAuthRequest = new AdminInitiateAuthRequest
             {
+                UserPoolId = _userPoolId,
                 AuthFlow = AuthFlowType.REFRESH_TOKEN,
                 ClientId = _clientId, // Your Cognito App Client ID
                 AuthParameters = new Dictionary<string, string>
@@ -86,7 +88,7 @@ public class CognitoAuthService
             };
 
             // Make the call to Cognito to get new tokens
-            var authResponse = await _cognitoClient.InitiateAuthAsync(initiateAuthRequest);
+            var authResponse = await _cognitoClient.AdminInitiateAuthAsync(initiateAuthRequest);
 
             // Check if the response contains the authentication result with new tokens
             if (authResponse.AuthenticationResult != null)
@@ -172,6 +174,21 @@ public class CognitoAuthService
         Console.WriteLine($"User '{email}' has been added to group '{roleName}'.");
         
         return response.HttpStatusCode == HttpStatusCode.OK;
+    }
+    
+    public async Task<IEnumerable<AdminRole>> GetAdminRoles()
+    {
+        var request = new ListGroupsRequest
+        {
+            UserPoolId = _userPoolId,
+            Limit = 10 // Maximum number of groups to return
+        };
+
+        var roles = new List<AdminRole>();
+    
+        var response = await _cognitoClient.ListGroupsAsync(request);
+        roles.AddRange(response.Groups.Select(group => new AdminRole { Name = group.GroupName, Description = group.Description, }));
+        return roles;
     }
 }
 

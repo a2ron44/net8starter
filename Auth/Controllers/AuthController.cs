@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var response = await _cognitoService.RefreshToken(request.Email, request.RefreshToken);
+            var response = await _cognitoService.RefreshToken(request.UserSubId, request.RefreshToken);
             return Ok(response);
         }
         catch (Exception ex)
@@ -75,13 +75,13 @@ public class AuthController : ControllerBase
         }
     }
     
-    [HttpPost("admin/userAdminRole")]
-    [ProducesResponseType(typeof(bool), 200)]
-    public async Task<IActionResult> AddUserToAdminRole([FromBody] AddUserAdminRoleRequest request)
+    [HttpGet("admin/adminRoles")]
+    [ProducesResponseType(typeof(IEnumerable<AdminRole>), 200)]
+    public async Task<IActionResult> GetAdminRoles()
     {
         try
         {
-            var response = await _cognitoService.AdminAddUserToGroup(request.Email, request.AdminRole);
+            var response = await _cognitoService.GetAdminRoles();
             return Ok(response);
         }
         catch (Exception ex)
